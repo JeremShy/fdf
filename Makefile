@@ -40,21 +40,21 @@ INC = $(addprefix -I,$(INC_PATH))
 all : $(NAME)
 
 $(NAME) :
-	mkdir lib/
-	make -C minilibx
-	make -C libft
+#	mkdir lib/
+#	make -C minilibx
+#	make -C libft
 	$(CC) $(LFLAGS) $(INC) -o $(NAME) $(SRC_NAME) -framework OpenGL -framework AppKit
 
 clean:
-		make -C libft clean
-		make -C minilibx clean
+#		make -C libft clean
+#		make -C minilibx clean
 	    rm -fv $(OBJ)
 	
 fclean: clean
 	rm -fv $(NAME)
-	rm -rf lib/
-	make -C libft fclean
-	make -C minilibx fclean
+#	rm -rf lib/
+#	make -C libft fclean
+#	make -C minilibx fclean
 
 re: fclean all
 

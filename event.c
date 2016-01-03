@@ -14,13 +14,13 @@
 
 void	zoom(int keycode, t_env *e)
 {
-	if (keycode == 78 && e->zoom >= 4)
+	if (keycode == 18 && e->zoom >= 4)
 	{
 		e->zoom -= 4;
 		mlx_clear_window(e->mlx, e->win);
 		print_graph(e->tab, e);
 	}
-	else if (keycode == 69)
+	else if (keycode == 19)
 	{
 		e->zoom += 4;
 		mlx_clear_window(e->mlx, e->win);

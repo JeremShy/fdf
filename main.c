@@ -26,7 +26,6 @@ void	print_graph(t_point **point, t_env *a)
 			draw_line(*(point[p]), *(point[p + a->xmax]), a);
 		p++;
 	}
-	mlx_do_sync(a->mlx);
 }
 
 int		handle_key_event(int keycode, t_env *e)
@@ -58,7 +57,6 @@ int		main(int ac, char **av)
 	}
 	e.tab = parsing(av[1], &e);
 	e.mlx = mlx_init();
-	mlx_do_key_autorepeatoff(e.mlx);
 	e.offset_x = 0;
 	e.offset_y = 0;
 	e.zoom = 30;
