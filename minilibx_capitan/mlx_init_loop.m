@@ -113,6 +113,29 @@ void mlx_pixel_put(mlx_ptr_t *mlx_ptr, mlx_win_list_t *win_ptr, int x, int y, in
 }
 
 
+void	mlx_int_loop_once()
+{
+  NSEvent *event;
+  NSDate  *thedate;
+
+  thedate = [NSDate dateWithTimeIntervalSinceNow:0.1];
+  while (42)
+    {
+      event = [NSApp nextEventMatchingMask:NSAnyEventMask
+		     untilDate:thedate
+		     inMode:NSDefaultRunLoopMode
+		     dequeue:YES];
+      if (event == nil)
+	{
+	  [thedate release];
+	  return ;
+	}
+      [NSApp sendEvent:event];
+      [NSApp updateWindows];
+    }
+}
+
+
 int     mlx_do_sync(mlx_ptr_t *mlx_ptr)
 {
   mlx_win_list_t *win;
@@ -125,6 +148,7 @@ int     mlx_do_sync(mlx_ptr_t *mlx_ptr)
 	  [(id)(win->winid) selectGLContext];
 	  [(id)(win->winid) mlx_gl_draw];
 	  glFlush();
+	  mlx_int_loop_once();
 	}
       win = win->next;
     }

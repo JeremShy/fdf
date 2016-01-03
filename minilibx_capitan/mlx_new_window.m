@@ -13,6 +13,7 @@
 NSOpenGLPixelFormatAttribute pfa_attrs[] =
   {
     NSOpenGLPFADepthSize, 32,
+    NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersionLegacy,
     0
   };
 
@@ -105,9 +106,22 @@ int get_mouse_button(NSEventType eventtype)
 - (void) flagsChanged:(NSEvent *)theEvent
 {
   int flag;
+  int the_key;
+  int val;
 
   flag = [theEvent modifierFlags];
   //  printf("Key flag changed: %x => %x\n", keyflag, flag);
+  //  printf("**mlx flag low part : %d  - %x\n", flag&0xFFFF, flag&0xFFFF);
+
+  val = (keyflag|flag)&(~(keyflag&flag));
+  the_key = 1;
+  while (((val >> (the_key-1)) & 0x01)==0)
+    the_key ++;
+  if (flag > keyflag && event_funct[2] != NULL)
+    event_funct[2](0xFF+the_key, event_param[2]);
+  if (flag < keyflag && event_funct[3] != NULL)
+    event_funct[3](0xFF+the_key, event_param[3]);
+  /*
   if (event_funct[2] != NULL)
     {
       if (!(keyflag & NSAlphaShiftKeyMask) && (flag&NSAlphaShiftKeyMask)) event_funct[2](0xFF+1, event_param[2]);
@@ -132,6 +146,7 @@ int get_mouse_button(NSEventType eventtype)
       if ((keyflag & NSHelpKeyMask) && !(flag&NSHelpKeyMask)) event_funct[3](0xFF+7, event_param[3]);
       if ((keyflag & NSFunctionKeyMask) && !(flag&NSFunctionKeyMask)) event_funct[3](0xFF+8, event_param[3]);
     }
+  */
   keyflag = flag;
 }
 
@@ -336,10 +351,18 @@ int get_mouse_button(NSEventType eventtype)
       [win setContentView:self];
       [win setTitle:title];
       [win setKeyRepeat:1];
+      [win makeKeyAndOrderFront:self];
+
       //      printf("init ctx: current %p ", [NSOpenGLContext currentContext]);
-      ctx = [[NSOpenGLContext alloc] initWithFormat:pixFmt shareContext:[NSOpenGLContext currentContext]]; //other_context];
-      [ctx setView:self];
-      [ctx makeCurrentContext];
+
+      //      ctx = [[NSOpenGLContext alloc] initWithFormat:pixFmt shareContext:[NSOpenGLContext currentContext]]; //other_context];
+      //      [ctx setView:self];
+      //      [ctx makeCurrentContext];
+
+      [[self openGLContext] makeCurrentContext];
+      [[self openGLContext] setView:self];
+      [self prepareOpenGL];
+
       [self setNextKeyView:self];
 
       //      [[NSNotificationCenter defaultCenter] addObserver:win selector:@selector(exposeNotification:) name:@"NSWindowDidExposeNotification" object:nil];
@@ -357,8 +380,6 @@ int get_mouse_button(NSEventType eventtype)
       glClear(GL_COLOR_BUFFER_BIT);
       glFlush();
 
-      [win orderFrontRegardless];
-      [win makeKeyWindow];
       //[win makeKeyAndOrderFront:nil];
       // BOOL r = [win isKeyWindow];
       //  if (r==YES) printf("keywindow ok\n"); else printf("keywindow KO\n");
@@ -494,7 +515,7 @@ int get_mouse_button(NSEventType eventtype)
 {
   [[NSNotificationCenter defaultCenter] removeObserver:win];
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [ctx release];
+  // [ctx release];
   [win close];
   [self release];
 }
@@ -517,6 +538,7 @@ int get_mouse_button(NSEventType eventtype)
 
 - (void) mlx_gl_draw_img:(mlx_img_list_t *)img andCtx:(mlx_img_ctx_t *)imgctx andX:(int)x andY:(int)y
 {
+
   if (pixel_nb >0)
     [self mlx_gl_draw];
 
